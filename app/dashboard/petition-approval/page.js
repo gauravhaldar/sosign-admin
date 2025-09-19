@@ -102,7 +102,7 @@ export default function PetitionApprovalPage() {
                 <div className="absolute -inset-2 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full blur"></div>
               </div>
               <h3 className="mt-4 text-lg font-semibold text-gray-900">No petitions to approve</h3>
-              <p className="mt-2 text-sm text-gray-500">You're all caught up for now.</p>
+              <p className="mt-2 text-sm text-gray-500">You&apos;re all caught up for now.</p>
             </div>
           ) : (
             <div className="space-y-4">

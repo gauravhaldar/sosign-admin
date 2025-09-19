@@ -56,8 +56,12 @@ const PetitionApprovalPage = () => {
     return (
       <div className="p-6">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-2">Unapproved Petitions</h1>
-          <p className="text-gray-600 font-medium">Review and approve pending petitions</p>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-2">
+            Unapproved Petitions
+          </h1>
+          <p className="text-gray-600 font-medium">
+            Review and approve pending petitions
+          </p>
         </div>
         <div className="flex items-center justify-center h-64">
           <div className="relative">
@@ -92,7 +96,9 @@ const PetitionApprovalPage = () => {
               <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-1">
                 Unapproved Petitions
               </h1>
-              <p className="text-gray-600 font-medium">Review and approve pending petitions</p>
+              <p className="text-gray-600 font-medium">
+                Review and approve pending petitions
+              </p>
             </div>
           </div>
           {petitions.length === 0 ? (
@@ -101,8 +107,12 @@ const PetitionApprovalPage = () => {
                 <i className="fas fa-clipboard-check text-6xl text-gray-300 mb-4"></i>
                 <div className="absolute -inset-2 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full blur"></div>
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-gray-900">No petitions to approve</h3>
-              <p className="mt-2 text-sm text-gray-500">You're all caught up for now.</p>
+              <h3 className="mt-4 text-lg font-semibold text-gray-900">
+                No petitions to approve
+              </h3>
+              <p className="mt-2 text-sm text-gray-500">
+                You&apos;re all caught up for now.
+              </p>
             </div>
           ) : (
             <div className="space-y-4">

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 const AdminCommentsSection = ({ petitionId }) => {
   const [comments, setComments] = useState([]);
@@ -11,41 +11,48 @@ const AdminCommentsSection = ({ petitionId }) => {
   const [hasMore, setHasMore] = useState(true);
 
   // Fetch comments
-  const fetchComments = async (pageNum = 1, append = false) => {
-    try {
-      setLoading(true);
-      const response = await fetch(
-        `/api/comments/petition/${petitionId}?page=${pageNum}&limit=50`
-      );
-      const data = await response.json();
+  const fetchComments = useCallback(
+    async (pageNum = 1, append = false) => {
+      try {
+        setLoading(true);
+        const response = await fetch(
+          `/api/comments/petition/${petitionId}?page=${pageNum}&limit=50`
+        );
+        const data = await response.json();
 
-      if (data.success) {
-        if (append) {
-          setComments((prev) => [...prev, ...data.comments]);
+        if (data.success) {
+          if (append) {
+            setComments((prev) => [...prev, ...data.comments]);
+          } else {
+            setComments(data.comments);
+          }
+          setHasMore(data.hasNextPage);
         } else {
-          setComments(data.comments);
+          setError(data.message);
         }
-        setHasMore(data.hasNextPage);
-      } else {
-        setError(data.message);
+      } catch (err) {
+        setError("Failed to fetch comments");
+        console.error("Error fetching comments:", err);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      setError("Failed to fetch comments");
-      console.error("Error fetching comments:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+    [petitionId]
+  );
 
   useEffect(() => {
     if (petitionId) {
       fetchComments();
     }
-  }, [petitionId]);
+  }, [petitionId, fetchComments]);
 
   // Delete comment
   const handleDeleteComment = async (commentId) => {
-    if (!confirm("Are you sure you want to delete this comment? This action cannot be undone.")) {
+    if (
+      !confirm(
+        "Are you sure you want to delete this comment? This action cannot be undone."
+      )
+    ) {
       return;
     }
 
@@ -58,7 +65,9 @@ const AdminCommentsSection = ({ petitionId }) => {
       const data = await response.json();
       if (data.success) {
         // Remove the comment from the state
-        setComments((prev) => prev.filter((comment) => comment._id !== commentId));
+        setComments((prev) =>
+          prev.filter((comment) => comment._id !== commentId)
+        );
         alert("Comment deleted successfully!");
       } else {
         setError(data.message);
@@ -154,8 +163,18 @@ const AdminCommentsSection = ({ petitionId }) => {
                   {deletingComment === comment._id ? (
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
                   ) : (
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
                     </svg>
                   )}
                 </button>
@@ -168,12 +187,18 @@ const AdminCommentsSection = ({ petitionId }) => {
               <div className="flex items-center space-x-4 text-sm text-gray-500">
                 <div className="flex items-center space-x-1">
                   <span>👍</span>
-                  <span>{comment.likes.length} like{comment.likes.length !== 1 ? "s" : ""}</span>
+                  <span>
+                    {comment.likes.length} like
+                    {comment.likes.length !== 1 ? "s" : ""}
+                  </span>
                 </div>
                 {comment.replies && comment.replies.length > 0 && (
                   <div className="flex items-center space-x-1">
                     <span>💬</span>
-                    <span>{comment.replies.length} repl{comment.replies.length !== 1 ? "ies" : "y"}</span>
+                    <span>
+                      {comment.replies.length} repl
+                      {comment.replies.length !== 1 ? "ies" : "y"}
+                    </span>
                   </div>
                 )}
               </div>
@@ -195,7 +220,9 @@ const AdminCommentsSection = ({ petitionId }) => {
                             <p className="text-xs text-gray-500">
                               {formatDate(reply.createdAt)}
                               {reply.isEdited && (
-                                <span className="text-gray-400 ml-1">(edited)</span>
+                                <span className="text-gray-400 ml-1">
+                                  (edited)
+                                </span>
                               )}
                             </p>
                           </div>
@@ -209,8 +236,18 @@ const AdminCommentsSection = ({ petitionId }) => {
                           {deletingComment === reply._id ? (
                             <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-red-600"></div>
                           ) : (
-                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            <svg
+                              className="w-3 h-3"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                              />
                             </svg>
                           )}
                         </button>

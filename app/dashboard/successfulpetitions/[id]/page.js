@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
+import Image from "next/image";
 
 export default function SuccessfulPetitionDetailPage() {
   const router = useRouter();
@@ -12,7 +13,7 @@ export default function SuccessfulPetitionDetailPage() {
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   // Fetch successful petition details
-  const fetchSuccessfulPetition = async () => {
+  const fetchSuccessfulPetition = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(
@@ -35,11 +36,15 @@ export default function SuccessfulPetitionDetailPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [params.id]);
 
   // Delete successful petition
   const handleDeleteSuccessfulPetition = async () => {
-    if (!confirm(`Are you sure you want to delete "${successfulPetition.petitionTitle}"?`)) {
+    if (
+      !confirm(
+        `Are you sure you want to delete "${successfulPetition.petitionTitle}"?`
+      )
+    ) {
       return;
     }
 
@@ -93,14 +98,18 @@ export default function SuccessfulPetitionDetailPage() {
     if (params.id) {
       fetchSuccessfulPetition();
     }
-  }, [params.id]);
+  }, [params.id, fetchSuccessfulPetition]);
 
   if (loading) {
     return (
       <div className="p-6">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-2">Successful Petition Details</h1>
-          <p className="text-gray-600 font-medium">Loading petition information...</p>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-2">
+            Successful Petition Details
+          </h1>
+          <p className="text-gray-600 font-medium">
+            Loading petition information...
+          </p>
         </div>
         <div className="flex items-center justify-center h-64">
           <div className="relative">
@@ -176,7 +185,9 @@ export default function SuccessfulPetitionDetailPage() {
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-2 px-3 py-1 bg-gray-50 rounded-xl border border-gray-200">
                   <i className="fas fa-hashtag text-gray-500"></i>
-                  <span className="text-gray-600 font-medium text-sm">ID: {successfulPetition._id}</span>
+                  <span className="text-gray-600 font-medium text-sm">
+                    ID: {successfulPetition._id}
+                  </span>
                 </div>
               </div>
             </div>
@@ -213,82 +224,94 @@ export default function SuccessfulPetitionDetailPage() {
                 <div className="p-3 bg-gradient-to-br from-green-100 to-green-200 rounded-xl">
                   <i className="fas fa-trophy text-green-600 text-lg"></i>
                 </div>
-                <h2 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Basic Information</h2>
+                <h2 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                  Basic Information
+                </h2>
               </div>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Title
-                </label>
-                <p className="text-lg font-medium text-gray-900">{successfulPetition.petitionTitle}</p>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Location
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Title
                   </label>
-                  <span className="px-4 py-2 bg-gradient-to-r from-green-100 to-green-200 text-green-800 rounded-xl text-sm font-semibold border border-green-200 inline-flex items-center gap-2">
-                    <i className="fas fa-map-marker-alt"></i>
-                    {successfulPetition.location}
-                  </span>
+                  <p className="text-lg font-medium text-gray-900">
+                    {successfulPetition.petitionTitle}
+                  </p>
                 </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Category
-                  </label>
-                  {successfulPetition.category ? (
-                    <span className="px-4 py-2 bg-gradient-to-r from-purple-100 to-purple-200 text-purple-800 rounded-xl text-sm font-semibold border border-purple-200 inline-flex items-center gap-2">
-                      <i className="fas fa-tag"></i>
-                      {successfulPetition.category}
-                    </span>
-                  ) : (
-                    <span className="text-gray-400 text-sm">Uncategorized</span>
-                  )}
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Total Signatures
-                  </label>
-                  <div className="flex items-center">
-                    <i className="fas fa-signature text-orange-500 mr-3 text-lg"></i>
-                    <span className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                      {successfulPetition.totalSignatures.toLocaleString()}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Location
+                    </label>
+                    <span className="px-4 py-2 bg-gradient-to-r from-green-100 to-green-200 text-green-800 rounded-xl text-sm font-semibold border border-green-200 inline-flex items-center gap-2">
+                      <i className="fas fa-map-marker-alt"></i>
+                      {successfulPetition.location}
                     </span>
                   </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Category
+                    </label>
+                    {successfulPetition.category ? (
+                      <span className="px-4 py-2 bg-gradient-to-r from-purple-100 to-purple-200 text-purple-800 rounded-xl text-sm font-semibold border border-purple-200 inline-flex items-center gap-2">
+                        <i className="fas fa-tag"></i>
+                        {successfulPetition.category}
+                      </span>
+                    ) : (
+                      <span className="text-gray-400 text-sm">
+                        Uncategorized
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Success Date
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <i className="fas fa-calendar-check text-green-500"></i>
-                    <p className="text-gray-900 font-medium">{formatSimpleDate(successfulPetition.successDate)}</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Total Signatures
+                    </label>
+                    <div className="flex items-center">
+                      <i className="fas fa-signature text-orange-500 mr-3 text-lg"></i>
+                      <span className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                        {successfulPetition.totalSignatures.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Success Date
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <i className="fas fa-calendar-check text-green-500"></i>
+                      <p className="text-gray-900 font-medium">
+                        {formatSimpleDate(successfulPetition.successDate)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Started Date
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <i className="fas fa-play text-blue-500"></i>
+                      <p className="text-gray-900 font-medium">
+                        {formatSimpleDate(successfulPetition.startedDate)}
+                      </p>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Created At
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <i className="fas fa-calendar text-indigo-500"></i>
+                      <p className="text-gray-900 font-medium">
+                        {formatDate(successfulPetition.createdAt)}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Started Date
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <i className="fas fa-play text-blue-500"></i>
-                    <p className="text-gray-900 font-medium">{formatSimpleDate(successfulPetition.startedDate)}</p>
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Created At
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <i className="fas fa-calendar text-indigo-500"></i>
-                    <p className="text-gray-900 font-medium">{formatDate(successfulPetition.createdAt)}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
             </div>
           </div>
 
@@ -300,7 +323,9 @@ export default function SuccessfulPetitionDetailPage() {
                 <div className="p-3 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl">
                   <i className="fas fa-file-alt text-blue-600 text-lg"></i>
                 </div>
-                <h2 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Issue Description</h2>
+                <h2 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                  Issue Description
+                </h2>
               </div>
               <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
                 <p className="text-gray-900 whitespace-pre-wrap leading-relaxed">
@@ -319,7 +344,9 @@ export default function SuccessfulPetitionDetailPage() {
                   <div className="p-3 bg-gradient-to-br from-green-100 to-green-200 rounded-xl">
                     <i className="fas fa-check-circle text-green-600 text-lg"></i>
                   </div>
-                  <h2 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Outcome</h2>
+                  <h2 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                    Outcome
+                  </h2>
                 </div>
                 <div className="bg-green-50 border border-green-200 rounded-xl p-4">
                   <p className="text-gray-900 whitespace-pre-wrap leading-relaxed">
@@ -339,11 +366,15 @@ export default function SuccessfulPetitionDetailPage() {
                   <div className="p-3 bg-gradient-to-br from-purple-100 to-purple-200 rounded-xl">
                     <i className="fas fa-image text-purple-600 text-lg"></i>
                   </div>
-                  <h2 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Image</h2>
+                  <h2 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                    Image
+                  </h2>
                 </div>
-                <img
+                <Image
                   src={successfulPetition.image}
                   alt="Successful petition image"
+                  width={800}
+                  height={400}
                   className="max-w-full h-auto rounded-xl border border-gray-200 shadow-sm"
                 />
               </div>
@@ -358,44 +389,57 @@ export default function SuccessfulPetitionDetailPage() {
                 <div className="p-3 bg-gradient-to-br from-orange-100 to-orange-200 rounded-xl">
                   <i className="fas fa-users text-orange-600 text-lg"></i>
                 </div>
-                <h2 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Decision Makers</h2>
+                <h2 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                  Decision Makers
+                </h2>
               </div>
-            <div className="grid gap-4">
-              {successfulPetition.decisionMakers.map((maker, index) => (
-                <div key={index} className="border border-gray-200 rounded-xl p-4 bg-gradient-to-r from-gray-50 to-white hover:shadow-md transition-all duration-200">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-1">
-                        <i className="fas fa-user text-blue-500 mr-1"></i>
-                        Name
-                      </label>
-                      <p className="text-gray-900 font-medium">{maker.name}</p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-1">
-                        <i className="fas fa-building text-green-500 mr-1"></i>
-                        Organization
-                      </label>
-                      <p className="text-gray-900 font-medium">{maker.organization || "N/A"}</p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-1">
-                        <i className="fas fa-envelope text-purple-500 mr-1"></i>
-                        Email
-                      </label>
-                      <p className="text-gray-900 font-medium">{maker.email}</p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-1">
-                        <i className="fas fa-phone text-orange-500 mr-1"></i>
-                        Phone
-                      </label>
-                      <p className="text-gray-900 font-medium">{maker.phone || "N/A"}</p>
+              <div className="grid gap-4">
+                {successfulPetition.decisionMakers.map((maker, index) => (
+                  <div
+                    key={index}
+                    className="border border-gray-200 rounded-xl p-4 bg-gradient-to-r from-gray-50 to-white hover:shadow-md transition-all duration-200"
+                  >
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1">
+                          <i className="fas fa-user text-blue-500 mr-1"></i>
+                          Name
+                        </label>
+                        <p className="text-gray-900 font-medium">
+                          {maker.name}
+                        </p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1">
+                          <i className="fas fa-building text-green-500 mr-1"></i>
+                          Organization
+                        </label>
+                        <p className="text-gray-900 font-medium">
+                          {maker.organization || "N/A"}
+                        </p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1">
+                          <i className="fas fa-envelope text-purple-500 mr-1"></i>
+                          Email
+                        </label>
+                        <p className="text-gray-900 font-medium">
+                          {maker.email}
+                        </p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1">
+                          <i className="fas fa-phone text-orange-500 mr-1"></i>
+                          Phone
+                        </label>
+                        <p className="text-gray-900 font-medium">
+                          {maker.phone || "N/A"}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -410,31 +454,43 @@ export default function SuccessfulPetitionDetailPage() {
                 <div className="p-3 bg-gradient-to-br from-green-100 to-green-200 rounded-xl">
                   <i className="fas fa-chart-bar text-green-600 text-lg"></i>
                 </div>
-                <h2 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Quick Stats</h2>
+                <h2 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                  Quick Stats
+                </h2>
               </div>
-            <div className="space-y-4">
-              <div className="text-center p-6 bg-gradient-to-r from-green-50 to-green-100 rounded-xl border border-green-200">
-                <i className="fas fa-signature text-green-500 text-2xl mb-2"></i>
-                <div className="text-3xl font-bold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">
-                  {successfulPetition.totalSignatures.toLocaleString()}
+              <div className="space-y-4">
+                <div className="text-center p-6 bg-gradient-to-r from-green-50 to-green-100 rounded-xl border border-green-200">
+                  <i className="fas fa-signature text-green-500 text-2xl mb-2"></i>
+                  <div className="text-3xl font-bold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">
+                    {successfulPetition.totalSignatures.toLocaleString()}
+                  </div>
+                  <div className="text-sm text-green-700 font-medium">
+                    Total Signatures
+                  </div>
                 </div>
-                <div className="text-sm text-green-700 font-medium">Total Signatures</div>
-              </div>
-              <div className="text-center p-6 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border border-blue-200">
-                <i className="fas fa-clock text-blue-500 text-2xl mb-2"></i>
-                <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
-                  {Math.ceil((new Date(successfulPetition.successDate) - new Date(successfulPetition.startedDate)) / (1000 * 60 * 60 * 24))}
+                <div className="text-center p-6 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border border-blue-200">
+                  <i className="fas fa-clock text-blue-500 text-2xl mb-2"></i>
+                  <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
+                    {Math.ceil(
+                      (new Date(successfulPetition.successDate) -
+                        new Date(successfulPetition.startedDate)) /
+                        (1000 * 60 * 60 * 24)
+                    )}
+                  </div>
+                  <div className="text-sm text-blue-700 font-medium">
+                    Days to Success
+                  </div>
                 </div>
-                <div className="text-sm text-blue-700 font-medium">Days to Success</div>
-              </div>
-              <div className="text-center p-6 bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl border border-purple-200">
-                <i className="fas fa-users text-purple-500 text-2xl mb-2"></i>
-                <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent">
-                  {successfulPetition.decisionMakers.length}
+                <div className="text-center p-6 bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl border border-purple-200">
+                  <i className="fas fa-users text-purple-500 text-2xl mb-2"></i>
+                  <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent">
+                    {successfulPetition.decisionMakers.length}
+                  </div>
+                  <div className="text-sm text-purple-700 font-medium">
+                    Decision Makers
+                  </div>
                 </div>
-                <div className="text-sm text-purple-700 font-medium">Decision Makers</div>
               </div>
-            </div>
             </div>
           </div>
 
@@ -446,7 +502,9 @@ export default function SuccessfulPetitionDetailPage() {
                 <div className="p-3 bg-gradient-to-br from-orange-100 to-orange-200 rounded-xl">
                   <i className="fas fa-user-circle text-orange-600 text-lg"></i>
                 </div>
-                <h2 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Petition Starter</h2>
+                <h2 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                  Petition Starter
+                </h2>
               </div>
               <div className="space-y-4">
                 <div>
@@ -454,7 +512,9 @@ export default function SuccessfulPetitionDetailPage() {
                     <i className="fas fa-user text-blue-500 mr-1"></i>
                     Name
                   </label>
-                  <p className="text-gray-900 font-medium">{successfulPetition.petitionStarterName}</p>
+                  <p className="text-gray-900 font-medium">
+                    {successfulPetition.petitionStarterName}
+                  </p>
                 </div>
               </div>
             </div>
@@ -469,46 +529,58 @@ export default function SuccessfulPetitionDetailPage() {
                   <div className="p-3 bg-gradient-to-br from-indigo-100 to-indigo-200 rounded-xl">
                     <i className="fas fa-link text-indigo-600 text-lg"></i>
                   </div>
-                  <h2 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Original Petition</h2>
+                  <h2 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                    Original Petition
+                  </h2>
                 </div>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
-                    <i className="fas fa-hashtag text-indigo-500 mr-1"></i>
-                    Petition ID
-                  </label>
-                  <p className="text-gray-900 font-mono text-sm bg-gray-50 px-3 py-2 rounded-lg border">
-                    {successfulPetition.originalPetitionId._id || successfulPetition.originalPetitionId}
-                  </p>
-                </div>
-                {successfulPetition.originalPetitionId.title && (
+                <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-1">
-                      <i className="fas fa-file-alt text-blue-500 mr-1"></i>
-                      Original Title
+                      <i className="fas fa-hashtag text-indigo-500 mr-1"></i>
+                      Petition ID
                     </label>
-                    <p className="text-gray-900 font-medium">{successfulPetition.originalPetitionId.title}</p>
-                  </div>
-                )}
-                {successfulPetition.originalPetitionId.numberOfSignatures && (
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">
-                      <i className="fas fa-signature text-green-500 mr-1"></i>
-                      Original Signatures
-                    </label>
-                    <p className="text-gray-900 font-medium">
-                      {successfulPetition.originalPetitionId.numberOfSignatures.toLocaleString()}
+                    <p className="text-gray-900 font-mono text-sm bg-gray-50 px-3 py-2 rounded-lg border">
+                      {successfulPetition.originalPetitionId._id ||
+                        successfulPetition.originalPetitionId}
                     </p>
                   </div>
-                )}
-                <button
-                  onClick={() => router.push(`/dashboard/petitions/${successfulPetition.originalPetitionId._id || successfulPetition.originalPetitionId}`)}
-                  className="w-full mt-3 px-4 py-2 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-xl hover:from-indigo-600 hover:to-indigo-700 transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center gap-2"
-                >
-                  <i className="fas fa-external-link-alt"></i>
-                  View Original Petition
-                </button>
-              </div>
+                  {successfulPetition.originalPetitionId.title && (
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">
+                        <i className="fas fa-file-alt text-blue-500 mr-1"></i>
+                        Original Title
+                      </label>
+                      <p className="text-gray-900 font-medium">
+                        {successfulPetition.originalPetitionId.title}
+                      </p>
+                    </div>
+                  )}
+                  {successfulPetition.originalPetitionId.numberOfSignatures && (
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">
+                        <i className="fas fa-signature text-green-500 mr-1"></i>
+                        Original Signatures
+                      </label>
+                      <p className="text-gray-900 font-medium">
+                        {successfulPetition.originalPetitionId.numberOfSignatures.toLocaleString()}
+                      </p>
+                    </div>
+                  )}
+                  <button
+                    onClick={() =>
+                      router.push(
+                        `/dashboard/petitions/${
+                          successfulPetition.originalPetitionId._id ||
+                          successfulPetition.originalPetitionId
+                        }`
+                      )
+                    }
+                    className="w-full mt-3 px-4 py-2 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-xl hover:from-indigo-600 hover:to-indigo-700 transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center gap-2"
+                  >
+                    <i className="fas fa-external-link-alt"></i>
+                    View Original Petition
+                  </button>
+                </div>
               </div>
             </div>
           )}
@@ -521,7 +593,9 @@ export default function SuccessfulPetitionDetailPage() {
                 <div className="p-3 bg-gradient-to-br from-purple-100 to-purple-200 rounded-xl">
                   <i className="fas fa-history text-purple-600 text-lg"></i>
                 </div>
-                <h2 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Timeline</h2>
+                <h2 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                  Timeline
+                </h2>
               </div>
               <div className="space-y-4">
                 <div className="flex items-start p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border border-blue-200">
@@ -529,8 +603,12 @@ export default function SuccessfulPetitionDetailPage() {
                     <i className="fas fa-play text-white text-xs"></i>
                   </div>
                   <div className="ml-4">
-                    <p className="text-sm font-semibold text-gray-900">Petition Started</p>
-                    <p className="text-sm text-gray-600">{formatSimpleDate(successfulPetition.startedDate)}</p>
+                    <p className="text-sm font-semibold text-gray-900">
+                      Petition Started
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      {formatSimpleDate(successfulPetition.startedDate)}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-xl border border-green-200">
@@ -538,8 +616,12 @@ export default function SuccessfulPetitionDetailPage() {
                     <i className="fas fa-check text-white text-xs"></i>
                   </div>
                   <div className="ml-4">
-                    <p className="text-sm font-semibold text-gray-900">Petition Succeeded</p>
-                    <p className="text-sm text-gray-600">{formatSimpleDate(successfulPetition.successDate)}</p>
+                    <p className="text-sm font-semibold text-gray-900">
+                      Petition Succeeded
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      {formatSimpleDate(successfulPetition.successDate)}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start p-4 bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl border border-purple-200">
@@ -547,8 +629,12 @@ export default function SuccessfulPetitionDetailPage() {
                     <i className="fas fa-database text-white text-xs"></i>
                   </div>
                   <div className="ml-4">
-                    <p className="text-sm font-semibold text-gray-900">Added to Database</p>
-                    <p className="text-sm text-gray-600">{formatSimpleDate(successfulPetition.createdAt)}</p>
+                    <p className="text-sm font-semibold text-gray-900">
+                      Added to Database
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      {formatSimpleDate(successfulPetition.createdAt)}
+                    </p>
                   </div>
                 </div>
               </div>
