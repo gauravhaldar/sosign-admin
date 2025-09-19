@@ -63,6 +63,11 @@ export default function Dashboard() {
   }, []);
 
   const formatNumber = (num) => {
+    // Handle undefined, null, or non-numeric values
+    if (num === undefined || num === null || typeof num !== "number") {
+      return "0";
+    }
+
     if (num >= 1000000) {
       return (num / 1000000).toFixed(1) + "M";
     } else if (num >= 1000) {
@@ -213,6 +218,30 @@ export default function Dashboard() {
     );
   }
 
+  // Add additional check for stats being null or missing required properties
+  if (!stats) {
+    return (
+      <div className="p-6">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-2">
+            Dashboard Overview
+          </h1>
+          <p className="text-gray-600 font-medium">
+            Welcome to your admin dashboard
+          </p>
+        </div>
+        <div className="bg-gradient-to-r from-yellow-50 to-yellow-100 border border-yellow-200 text-yellow-700 px-6 py-4 rounded-xl shadow-sm">
+          <div className="flex items-center gap-3">
+            <i className="fas fa-info-circle text-yellow-500 text-lg"></i>
+            <p className="font-semibold">
+              No data available. Please refresh the page.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6">
       <div className="mb-8">
@@ -236,7 +265,7 @@ export default function Dashboard() {
                   Total Petitions
                 </p>
                 <p className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                  {formatNumber(stats.totalPetitions)}
+                  {formatNumber(stats?.totalPetitions || 0)}
                 </p>
               </div>
               <div className="p-4 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl group-hover:scale-110 transition-transform duration-300">
@@ -256,7 +285,7 @@ export default function Dashboard() {
                   Total Signatures
                 </p>
                 <p className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                  {formatNumber(stats.totalSignatures)}
+                  {formatNumber(stats?.totalSignatures || 0)}
                 </p>
               </div>
               <div className="p-4 bg-gradient-to-br from-green-100 to-green-200 rounded-2xl group-hover:scale-110 transition-transform duration-300">
@@ -276,7 +305,7 @@ export default function Dashboard() {
                   Total Users
                 </p>
                 <p className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                  {formatNumber(stats.totalUsers)}
+                  {formatNumber(stats?.totalUsers || 0)}
                 </p>
               </div>
               <div className="p-4 bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl group-hover:scale-110 transition-transform duration-300">
@@ -296,7 +325,7 @@ export default function Dashboard() {
                   Victories
                 </p>
                 <p className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                  {formatNumber(stats.victories)}
+                  {formatNumber(stats?.victories || 0)}
                 </p>
               </div>
               <div className="p-4 bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-2xl group-hover:scale-110 transition-transform duration-300">
@@ -330,7 +359,7 @@ export default function Dashboard() {
                   </span>
                 </div>
                 <span className="font-bold text-gray-900 text-lg">
-                  {formatNumber(stats.breakdown.activePetitions)}
+                  {formatNumber(stats?.breakdown?.activePetitions || 0)}
                 </span>
               </div>
               <div className="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-xl border border-green-200/50 hover:shadow-md transition-all duration-200">
@@ -341,7 +370,7 @@ export default function Dashboard() {
                   </span>
                 </div>
                 <span className="font-bold text-gray-900 text-lg">
-                  {formatNumber(stats.breakdown.successfulPetitions)}
+                  {formatNumber(stats?.breakdown?.successfulPetitions || 0)}
                 </span>
               </div>
             </div>
@@ -369,7 +398,7 @@ export default function Dashboard() {
                   </span>
                 </div>
                 <span className="font-bold text-gray-900 text-lg">
-                  {formatNumber(stats.breakdown.activeSignatures)}
+                  {formatNumber(stats?.breakdown?.activeSignatures || 0)}
                 </span>
               </div>
               <div className="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-xl border border-green-200/50 hover:shadow-md transition-all duration-200">
@@ -380,7 +409,7 @@ export default function Dashboard() {
                   </span>
                 </div>
                 <span className="font-bold text-gray-900 text-lg">
-                  {formatNumber(stats.breakdown.successfulSignatures)}
+                  {formatNumber(stats?.breakdown?.successfulSignatures || 0)}
                 </span>
               </div>
             </div>
@@ -467,7 +496,7 @@ export default function Dashboard() {
             <div className="text-center">
               <div className="relative inline-block">
                 <div className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-3">
-                  {formatNumber(stats.recentActivity)}
+                  {formatNumber(stats?.recentActivity || 0)}
                 </div>
                 <div className="absolute -inset-2 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full blur"></div>
               </div>
