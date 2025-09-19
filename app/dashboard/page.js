@@ -36,7 +36,14 @@ export default function Dashboard() {
     const fetchStats = async () => {
       try {
         setLoading(true);
-        const response = await fetch("/api/stats");
+        const response = await fetch(
+          `${
+            process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+          }/api/admin/stats`,
+          {
+            credentials: "include", // Include admin cookies
+          }
+        );
         const data = await response.json();
 
         if (data.success) {
@@ -84,16 +91,19 @@ export default function Dashboard() {
     };
   }, [stats]);
 
-  const petitionsDoughnutOptions = useMemo(() => ({
-    responsive: true,
-    maintainAspectRatio: false,
-    animation: { duration: 400 },
-    layout: { padding: 0 },
-    plugins: {
-      legend: { position: "bottom", labels: { boxWidth: 12, padding: 12 } },
-      tooltip: { enabled: true },
-    },
-  }), []);
+  const petitionsDoughnutOptions = useMemo(
+    () => ({
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 400 },
+      layout: { padding: 0 },
+      plugins: {
+        legend: { position: "bottom", labels: { boxWidth: 12, padding: 12 } },
+        tooltip: { enabled: true },
+      },
+    }),
+    []
+  );
 
   const signaturesDoughnutData = useMemo(() => {
     if (!stats) return { labels: [], datasets: [] };
@@ -163,8 +173,12 @@ export default function Dashboard() {
     return (
       <div className="p-6">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-2">Dashboard Overview</h1>
-          <p className="text-gray-600 font-medium">Welcome to your admin dashboard</p>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-2">
+            Dashboard Overview
+          </h1>
+          <p className="text-gray-600 font-medium">
+            Welcome to your admin dashboard
+          </p>
         </div>
         <div className="flex items-center justify-center h-64">
           <div className="relative">
@@ -182,8 +196,12 @@ export default function Dashboard() {
     return (
       <div className="p-6">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-2">Dashboard Overview</h1>
-          <p className="text-gray-600 font-medium">Welcome to your admin dashboard</p>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-2">
+            Dashboard Overview
+          </h1>
+          <p className="text-gray-600 font-medium">
+            Welcome to your admin dashboard
+          </p>
         </div>
         <div className="bg-gradient-to-r from-red-50 to-red-100 border border-red-200 text-red-700 px-6 py-4 rounded-xl shadow-sm">
           <div className="flex items-center gap-3">
@@ -198,10 +216,14 @@ export default function Dashboard() {
   return (
     <div className="p-6">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-2">Dashboard Overview</h1>
-        <p className="text-gray-600 font-medium">Welcome to your admin dashboard</p>
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-2">
+          Dashboard Overview
+        </h1>
+        <p className="text-gray-600 font-medium">
+          Welcome to your admin dashboard
+        </p>
       </div>
-      
+
       {/* Main Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {/* Total Petitions */}
@@ -210,8 +232,12 @@ export default function Dashboard() {
           <div className="relative z-10">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold text-gray-600 mb-1">Total Petitions</p>
-                <p className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">{formatNumber(stats.totalPetitions)}</p>
+                <p className="text-sm font-semibold text-gray-600 mb-1">
+                  Total Petitions
+                </p>
+                <p className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                  {formatNumber(stats.totalPetitions)}
+                </p>
               </div>
               <div className="p-4 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl group-hover:scale-110 transition-transform duration-300">
                 <i className="fas fa-file-alt text-blue-600 text-xl"></i>
@@ -226,8 +252,12 @@ export default function Dashboard() {
           <div className="relative z-10">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold text-gray-600 mb-1">Total Signatures</p>
-                <p className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">{formatNumber(stats.totalSignatures)}</p>
+                <p className="text-sm font-semibold text-gray-600 mb-1">
+                  Total Signatures
+                </p>
+                <p className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                  {formatNumber(stats.totalSignatures)}
+                </p>
               </div>
               <div className="p-4 bg-gradient-to-br from-green-100 to-green-200 rounded-2xl group-hover:scale-110 transition-transform duration-300">
                 <i className="fas fa-signature text-green-600 text-xl"></i>
@@ -242,8 +272,12 @@ export default function Dashboard() {
           <div className="relative z-10">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold text-gray-600 mb-1">Total Users</p>
-                <p className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">{formatNumber(stats.totalUsers)}</p>
+                <p className="text-sm font-semibold text-gray-600 mb-1">
+                  Total Users
+                </p>
+                <p className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                  {formatNumber(stats.totalUsers)}
+                </p>
               </div>
               <div className="p-4 bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl group-hover:scale-110 transition-transform duration-300">
                 <i className="fas fa-users text-purple-600 text-xl"></i>
@@ -258,8 +292,12 @@ export default function Dashboard() {
           <div className="relative z-10">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold text-gray-600 mb-1">Victories</p>
-                <p className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">{formatNumber(stats.victories)}</p>
+                <p className="text-sm font-semibold text-gray-600 mb-1">
+                  Victories
+                </p>
+                <p className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                  {formatNumber(stats.victories)}
+                </p>
               </div>
               <div className="p-4 bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-2xl group-hover:scale-110 transition-transform duration-300">
                 <i className="fas fa-trophy text-yellow-600 text-xl"></i>
@@ -279,22 +317,32 @@ export default function Dashboard() {
               <div className="p-3 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl">
                 <i className="fas fa-chart-pie text-blue-600 text-lg"></i>
               </div>
-              <h3 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Petition Breakdown</h3>
+              <h3 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                Petition Breakdown
+              </h3>
             </div>
             <div className="space-y-4">
               <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border border-blue-200/50 hover:shadow-md transition-all duration-200">
                 <div className="flex items-center space-x-3">
                   <div className="w-4 h-4 bg-blue-500 rounded-full shadow-sm"></div>
-                  <span className="text-gray-700 font-medium">Active Petitions</span>
+                  <span className="text-gray-700 font-medium">
+                    Active Petitions
+                  </span>
                 </div>
-                <span className="font-bold text-gray-900 text-lg">{formatNumber(stats.breakdown.activePetitions)}</span>
+                <span className="font-bold text-gray-900 text-lg">
+                  {formatNumber(stats.breakdown.activePetitions)}
+                </span>
               </div>
               <div className="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-xl border border-green-200/50 hover:shadow-md transition-all duration-200">
                 <div className="flex items-center space-x-3">
                   <div className="w-4 h-4 bg-green-500 rounded-full shadow-sm"></div>
-                  <span className="text-gray-700 font-medium">Successful Petitions</span>
+                  <span className="text-gray-700 font-medium">
+                    Successful Petitions
+                  </span>
                 </div>
-                <span className="font-bold text-gray-900 text-lg">{formatNumber(stats.breakdown.successfulPetitions)}</span>
+                <span className="font-bold text-gray-900 text-lg">
+                  {formatNumber(stats.breakdown.successfulPetitions)}
+                </span>
               </div>
             </div>
           </div>
@@ -308,22 +356,32 @@ export default function Dashboard() {
               <div className="p-3 bg-gradient-to-br from-green-100 to-green-200 rounded-xl">
                 <i className="fas fa-signature text-green-600 text-lg"></i>
               </div>
-              <h3 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Signature Breakdown</h3>
+              <h3 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                Signature Breakdown
+              </h3>
             </div>
             <div className="space-y-4">
               <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border border-blue-200/50 hover:shadow-md transition-all duration-200">
                 <div className="flex items-center space-x-3">
                   <div className="w-4 h-4 bg-blue-500 rounded-full shadow-sm"></div>
-                  <span className="text-gray-700 font-medium">Active Petition Signatures</span>
+                  <span className="text-gray-700 font-medium">
+                    Active Petition Signatures
+                  </span>
                 </div>
-                <span className="font-bold text-gray-900 text-lg">{formatNumber(stats.breakdown.activeSignatures)}</span>
+                <span className="font-bold text-gray-900 text-lg">
+                  {formatNumber(stats.breakdown.activeSignatures)}
+                </span>
               </div>
               <div className="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-xl border border-green-200/50 hover:shadow-md transition-all duration-200">
                 <div className="flex items-center space-x-3">
                   <div className="w-4 h-4 bg-green-500 rounded-full shadow-sm"></div>
-                  <span className="text-gray-700 font-medium">Successful Petition Signatures</span>
+                  <span className="text-gray-700 font-medium">
+                    Successful Petition Signatures
+                  </span>
                 </div>
-                <span className="font-bold text-gray-900 text-lg">{formatNumber(stats.breakdown.successfulSignatures)}</span>
+                <span className="font-bold text-gray-900 text-lg">
+                  {formatNumber(stats.breakdown.successfulSignatures)}
+                </span>
               </div>
             </div>
           </div>
@@ -332,8 +390,7 @@ export default function Dashboard() {
 
       {/* Charts & Graphs */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        {/* Petitions Breakdown Doughnut */
-        }
+        {/* Petitions Breakdown Doughnut */}
         <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-200/50 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-500/5 to-purple-500/5 rounded-full -translate-y-12 translate-x-12"></div>
           <div className="relative z-10">
@@ -341,10 +398,15 @@ export default function Dashboard() {
               <div className="p-3 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl">
                 <i className="fas fa-chart-pie text-blue-600 text-lg"></i>
               </div>
-              <h3 className="text-lg font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Petitions Status</h3>
+              <h3 className="text-lg font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                Petitions Status
+              </h3>
             </div>
             <div className="h-64">
-              <Doughnut data={petitionsDoughnutData} options={petitionsDoughnutOptions} />
+              <Doughnut
+                data={petitionsDoughnutData}
+                options={petitionsDoughnutOptions}
+              />
             </div>
           </div>
         </div>
@@ -357,10 +419,15 @@ export default function Dashboard() {
               <div className="p-3 bg-gradient-to-br from-green-100 to-green-200 rounded-xl">
                 <i className="fas fa-chart-pie text-green-600 text-lg"></i>
               </div>
-              <h3 className="text-lg font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Signatures Mix</h3>
+              <h3 className="text-lg font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                Signatures Mix
+              </h3>
             </div>
             <div className="h-64">
-              <Doughnut data={signaturesDoughnutData} options={signaturesDoughnutOptions} />
+              <Doughnut
+                data={signaturesDoughnutData}
+                options={signaturesDoughnutOptions}
+              />
             </div>
           </div>
         </div>
@@ -373,7 +440,9 @@ export default function Dashboard() {
               <div className="p-3 bg-gradient-to-br from-purple-100 to-purple-200 rounded-xl">
                 <i className="fas fa-chart-bar text-purple-600 text-lg"></i>
               </div>
-              <h3 className="text-lg font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Totals Overview</h3>
+              <h3 className="text-lg font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                Totals Overview
+              </h3>
             </div>
             <div className="h-64">
               <Bar data={totalsBarData} options={totalsBarOptions} />
@@ -390,15 +459,21 @@ export default function Dashboard() {
             <div className="p-3 bg-gradient-to-br from-orange-100 to-orange-200 rounded-xl">
               <i className="fas fa-chart-line text-orange-600 text-lg"></i>
             </div>
-            <h3 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Recent Activity (Last 30 Days)</h3>
+            <h3 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+              Recent Activity (Last 30 Days)
+            </h3>
           </div>
           <div className="flex items-center justify-center p-8">
             <div className="text-center">
               <div className="relative inline-block">
-                <div className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-3">{formatNumber(stats.recentActivity)}</div>
+                <div className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-3">
+                  {formatNumber(stats.recentActivity)}
+                </div>
                 <div className="absolute -inset-2 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full blur"></div>
               </div>
-              <p className="text-gray-600 font-medium text-lg">New petitions and successful campaigns</p>
+              <p className="text-gray-600 font-medium text-lg">
+                New petitions and successful campaigns
+              </p>
             </div>
           </div>
         </div>
