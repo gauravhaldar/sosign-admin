@@ -15,20 +15,22 @@ const AdminCommentsSection = ({ petitionId }) => {
     async (pageNum = 1, append = false) => {
       try {
         setLoading(true);
+        const apiUrl =
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
         const response = await fetch(
-          `/api/comments/petition/${petitionId}?page=${pageNum}&limit=50`
+          `${apiUrl}/api/comments/petition/${petitionId}?page=${pageNum}&limit=50`
         );
         const data = await response.json();
 
         if (data.success) {
           if (append) {
-            setComments((prev) => [...prev, ...data.comments]);
+            setComments((prev) => [...prev, ...(data.comments || [])]);
           } else {
-            setComments(data.comments);
+            setComments(data.comments || []);
           }
-          setHasMore(data.hasNextPage);
+          setHasMore(data.hasNextPage || false);
         } else {
-          setError(data.message);
+          setError(data.message || "Failed to fetch comments");
         }
       } catch (err) {
         setError("Failed to fetch comments");
@@ -58,8 +60,10 @@ const AdminCommentsSection = ({ petitionId }) => {
 
     try {
       setDeletingComment(commentId);
-      const response = await fetch(`/api/comments/${commentId}`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const response = await fetch(`${apiUrl}/api/comments/${commentId}`, {
         method: "DELETE",
+        credentials: "include", // Include admin cookies
       });
 
       const data = await response.json();
@@ -70,8 +74,8 @@ const AdminCommentsSection = ({ petitionId }) => {
         );
         alert("Comment deleted successfully!");
       } else {
-        setError(data.message);
-        alert("Failed to delete comment: " + data.message);
+        setError(data.message || "Failed to delete comment");
+        alert("Failed to delete comment: " + (data.message || "Unknown error"));
       }
     } catch (err) {
       setError("Failed to delete comment");
@@ -107,7 +111,8 @@ const AdminCommentsSection = ({ petitionId }) => {
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold text-gray-900">Comments</h2>
         <span className="text-sm text-gray-500">
-          {comments.length} comment{comments.length !== 1 ? "s" : ""}
+          {(comments || []).length} comment
+          {(comments || []).length !== 1 ? "s" : ""}
         </span>
       </div>
 
@@ -139,14 +144,16 @@ const AdminCommentsSection = ({ petitionId }) => {
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center space-x-3">
                   <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-medium">
-                    {comment.user.name.charAt(0).toUpperCase()}
+                    {comment?.user?.name
+                      ? comment.user.name.charAt(0).toUpperCase()
+                      : "?"}
                   </div>
                   <div>
                     <p className="font-medium text-gray-900">
-                      {comment.user.name}
+                      {comment?.user?.name || "Unknown User"}
                     </p>
                     <p className="text-sm text-gray-500">
-                      {comment.user.designation || "Citizen"} •{" "}
+                      {comment?.user?.designation || "Citizen"} •{" "}
                       {formatDate(comment.createdAt)}
                       {comment.isEdited && (
                         <span className="text-gray-400 ml-1">(edited)</span>
@@ -181,18 +188,18 @@ const AdminCommentsSection = ({ petitionId }) => {
               </div>
 
               {/* Comment Content */}
-              <p className="text-gray-800 mb-3">{comment.content}</p>
+              <p className="text-gray-800 mb-3">{comment?.content || ""}</p>
 
               {/* Comment Stats */}
               <div className="flex items-center space-x-4 text-sm text-gray-500">
                 <div className="flex items-center space-x-1">
                   <span>👍</span>
                   <span>
-                    {comment.likes.length} like
-                    {comment.likes.length !== 1 ? "s" : ""}
+                    {(comment?.likes || []).length} like
+                    {(comment?.likes || []).length !== 1 ? "s" : ""}
                   </span>
                 </div>
-                {comment.replies && comment.replies.length > 0 && (
+                {comment?.replies && comment.replies.length > 0 && (
                   <div className="flex items-center space-x-1">
                     <span>💬</span>
                     <span>
@@ -204,18 +211,20 @@ const AdminCommentsSection = ({ petitionId }) => {
               </div>
 
               {/* Replies */}
-              {comment.replies && comment.replies.length > 0 && (
+              {comment?.replies && comment.replies.length > 0 && (
                 <div className="mt-4 pl-8 border-l-2 border-gray-200 space-y-3">
                   {comment.replies.map((reply) => (
                     <div key={reply._id} className="bg-gray-50 rounded-lg p-3">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center space-x-2">
                           <div className="w-6 h-6 bg-gray-400 rounded-full flex items-center justify-center text-white text-xs font-medium">
-                            {reply.user.name.charAt(0).toUpperCase()}
+                            {reply?.user?.name
+                              ? reply.user.name.charAt(0).toUpperCase()
+                              : "?"}
                           </div>
                           <div>
                             <p className="font-medium text-sm text-gray-900">
-                              {reply.user.name}
+                              {reply?.user?.name || "Unknown User"}
                             </p>
                             <p className="text-xs text-gray-500">
                               {formatDate(reply.createdAt)}
@@ -252,7 +261,9 @@ const AdminCommentsSection = ({ petitionId }) => {
                           )}
                         </button>
                       </div>
-                      <p className="text-sm text-gray-800">{reply.content}</p>
+                      <p className="text-sm text-gray-800">
+                        {reply?.content || ""}
+                      </p>
                     </div>
                   ))}
                 </div>
