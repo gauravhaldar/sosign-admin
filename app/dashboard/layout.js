@@ -64,6 +64,12 @@ export default function DashboardLayout({ children }) {
             color: "from-green-500 to-green-600",
         },
         {
+            name: "Comment Approval",
+            href: "/dashboard/comment-approval",
+            icon: "fas fa-comments",
+            color: "from-orange-500 to-orange-600",
+        },
+        {
             name: "All Petitions",
             href: "/dashboard/petitions",
             icon: "fas fa-file-alt",
@@ -155,8 +161,8 @@ export default function DashboardLayout({ children }) {
                             key={item.name}
                             href={item.href}
                             className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${isActive(item.href)
-                                    ? `bg-gradient-to-r ${item.color} text-white shadow-lg`
-                                    : "text-gray-600 hover:bg-gray-100"
+                                ? `bg-gradient-to-r ${item.color} text-white shadow-lg`
+                                : "text-gray-600 hover:bg-gray-100"
                                 }`}
                             onClick={() => setMobileMenuOpen(false)}
                         >
