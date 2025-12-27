@@ -11,7 +11,7 @@ export default function AdsManagementPage() {
     const [formData, setFormData] = useState({
         title: "",
         description: "",
-        targetUrl: "",
+        link: "",
         position: "sidebar",
         isActive: true,
         priority: 0,
@@ -54,7 +54,7 @@ export default function AdsManagementPage() {
         setFormData({
             title: "",
             description: "",
-            targetUrl: "",
+            link: "",
             position: "sidebar",
             isActive: true,
             priority: 0,
@@ -78,14 +78,14 @@ export default function AdsManagementPage() {
         setFormData({
             title: ad.title,
             description: ad.description || "",
-            targetUrl: ad.targetUrl || "",
+            link: ad.link || "",
             position: ad.position,
             isActive: ad.isActive,
             priority: ad.priority,
             startDate: ad.startDate ? ad.startDate.split("T")[0] : "",
             endDate: ad.endDate ? ad.endDate.split("T")[0] : "",
         });
-        setImagePreview(ad.imageUrl);
+        setImagePreview(ad.image || ad.imageUrl);
         setShowModal(true);
     };
 
@@ -111,7 +111,7 @@ export default function AdsManagementPage() {
             const formDataToSend = new FormData();
             formDataToSend.append("title", formData.title);
             formDataToSend.append("description", formData.description);
-            formDataToSend.append("targetUrl", formData.targetUrl);
+            formDataToSend.append("link", formData.link);
             formDataToSend.append("position", formData.position);
             formDataToSend.append("isActive", formData.isActive);
             formDataToSend.append("priority", formData.priority);
@@ -243,7 +243,7 @@ export default function AdsManagementPage() {
                             {/* Image */}
                             <div className="relative h-48 bg-gray-100">
                                 <img
-                                    src={ad.imageUrl}
+                                    src={ad.image || ad.imageUrl}
                                     alt={ad.title}
                                     className="w-full h-full object-cover"
                                 />
@@ -366,7 +366,7 @@ export default function AdsManagementPage() {
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     setImageFile(null);
-                                                    setImagePreview(editingAd ? editingAd.imageUrl : null);
+                                                    setImagePreview(editingAd ? (editingAd.image || editingAd.imageUrl) : null);
                                                 }}
                                                 className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 z-20"
                                             >
@@ -420,9 +420,9 @@ export default function AdsManagementPage() {
                                 </label>
                                 <input
                                     type="url"
-                                    value={formData.targetUrl}
+                                    value={formData.link}
                                     onChange={(e) =>
-                                        setFormData({ ...formData, targetUrl: e.target.value })
+                                        setFormData({ ...formData, link: e.target.value })
                                     }
                                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                                     placeholder="https://example.com"
