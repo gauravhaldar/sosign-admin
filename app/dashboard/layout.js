@@ -87,6 +87,12 @@ export default function DashboardLayout({ children }) {
             icon: "fas fa-ad",
             color: "from-pink-500 to-pink-600",
         },
+        {
+            name: "Download Requests",
+            href: "/dashboard/download-requests",
+            icon: "fas fa-download",
+            color: "from-teal-500 to-teal-600",
+        },
     ];
 
     const isActive = (href) => {
