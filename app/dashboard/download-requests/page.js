@@ -12,6 +12,7 @@ export default function DownloadRequestsPage() {
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [actionType, setActionType] = useState(null);
     const [stats, setStats] = useState({ pending: 0, approved: 0, rejected: 0 });
+    const [approvedFields, setApprovedFields] = useState([]);
 
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -65,7 +66,7 @@ export default function DownloadRequestsPage() {
     }, [filter]);
 
     // Handle approve
-    const handleApprove = async (requestId, note = "") => {
+    const handleApprove = async (requestId, note = "", fields = []) => {
         setProcessingId(requestId);
         try {
             const response = await fetch(
@@ -74,7 +75,7 @@ export default function DownloadRequestsPage() {
                     method: "PUT",
                     credentials: "include",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ adminNote: note }),
+                    body: JSON.stringify({ adminNote: note, approvedFields: fields }),
                 }
             );
 
@@ -83,6 +84,7 @@ export default function DownloadRequestsPage() {
                 fetchStats();
                 setShowNoteModal(false);
                 setAdminNote("");
+                setApprovedFields([]);
             }
         } catch (error) {
             console.error("Error approving request:", error);
@@ -110,6 +112,7 @@ export default function DownloadRequestsPage() {
                 fetchStats();
                 setShowNoteModal(false);
                 setAdminNote("");
+                setApprovedFields([]);
             }
         } catch (error) {
             console.error("Error rejecting request:", error);
@@ -123,6 +126,12 @@ export default function DownloadRequestsPage() {
         setSelectedRequest(request);
         setActionType(action);
         setAdminNote("");
+        // Pre-select all requested fields when approving
+        if (action === "approve" && request.requestedFields) {
+            setApprovedFields([...request.requestedFields]);
+        } else {
+            setApprovedFields([]);
+        }
         setShowNoteModal(true);
     };
 
@@ -230,8 +239,16 @@ export default function DownloadRequestsPage() {
                                         Reason
                                     </th>
                                     <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Requested
+                                        Requested Data
                                     </th>
+                                    <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Date
+                                    </th>
+                                    {filter === "approved" && (
+                                        <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Approved Data
+                                        </th>
+                                    )}
                                     {filter !== "pending" && (
                                         <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Admin Note
@@ -245,62 +262,106 @@ export default function DownloadRequestsPage() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
-                                {requests.map((request) => (
-                                    <tr key={request._id} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4">
-                                            <div>
-                                                <p className="font-medium text-gray-800">
-                                                    {request.user?.name || "Unknown"}
-                                                </p>
-                                                <p className="text-sm text-gray-500">
-                                                    {request.user?.email || "N/A"}
-                                                </p>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <p className="text-gray-800 max-w-xs truncate">
-                                                {request.petition?.title || "Unknown Petition"}
-                                            </p>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <p className="text-gray-600 text-sm max-w-xs line-clamp-2">
-                                                {request.reason}
-                                            </p>
-                                        </td>
-                                        <td className="px-6 py-4 text-sm text-gray-500">
-                                            {formatDate(request.createdAt)}
-                                        </td>
-                                        {filter !== "pending" && (
+                                {requests.map((request) => {
+                                    const fieldLabels = {
+                                        petitionDetails: "Details",
+                                        petitionStarter: "Starter",
+                                        decisionMakers: "Decision Makers",
+                                        statistics: "Stats",
+                                        signatures: "Signatures",
+                                        comments: "Comments",
+                                    };
+                                    return (
+                                        <tr key={request._id} className="hover:bg-gray-50">
                                             <td className="px-6 py-4">
-                                                <p className="text-gray-600 text-sm max-w-xs line-clamp-2">
-                                                    {request.adminNote || "-"}
-                                                </p>
-                                            </td>
-                                        )}
-                                        {filter === "pending" && (
-                                            <td className="px-6 py-4 text-right">
-                                                <div className="flex items-center justify-end gap-2">
-                                                    <button
-                                                        onClick={() => openNoteModal(request, "approve")}
-                                                        disabled={processingId === request._id}
-                                                        className="px-3 py-1.5 bg-green-100 text-green-700 rounded-lg text-sm font-medium hover:bg-green-200 transition-colors disabled:opacity-50"
-                                                    >
-                                                        <i className="fas fa-check mr-1"></i>
-                                                        Approve
-                                                    </button>
-                                                    <button
-                                                        onClick={() => openNoteModal(request, "reject")}
-                                                        disabled={processingId === request._id}
-                                                        className="px-3 py-1.5 bg-red-100 text-red-700 rounded-lg text-sm font-medium hover:bg-red-200 transition-colors disabled:opacity-50"
-                                                    >
-                                                        <i className="fas fa-times mr-1"></i>
-                                                        Reject
-                                                    </button>
+                                                <div>
+                                                    <p className="font-medium text-gray-800">
+                                                        {request.user?.name || "Unknown"}
+                                                    </p>
+                                                    <p className="text-sm text-gray-500">
+                                                        {request.user?.email || "N/A"}
+                                                    </p>
                                                 </div>
                                             </td>
-                                        )}
-                                    </tr>
-                                ))}
+                                            <td className="px-6 py-4">
+                                                <p className="text-gray-800 max-w-xs truncate">
+                                                    {request.petition?.title || "Unknown Petition"}
+                                                </p>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <p className="text-gray-600 text-sm max-w-xs line-clamp-2">
+                                                    {request.reason}
+                                                </p>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex flex-wrap gap-1 max-w-xs">
+                                                    {request.requestedFields && request.requestedFields.length > 0 ? (
+                                                        request.requestedFields.map((field) => (
+                                                            <span
+                                                                key={field}
+                                                                className="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-xs rounded"
+                                                            >
+                                                                {fieldLabels[field] || field}
+                                                            </span>
+                                                        ))
+                                                    ) : (
+                                                        <span className="text-gray-400 text-sm">All fields</span>
+                                                    )}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 text-sm text-gray-500">
+                                                {formatDate(request.createdAt)}
+                                            </td>
+                                            {filter === "approved" && (
+                                                <td className="px-6 py-4">
+                                                    <div className="flex flex-wrap gap-1 max-w-xs">
+                                                        {request.approvedFields && request.approvedFields.length > 0 ? (
+                                                            request.approvedFields.map((field) => (
+                                                                <span
+                                                                    key={field}
+                                                                    className="px-1.5 py-0.5 bg-green-100 text-green-700 text-xs rounded"
+                                                                >
+                                                                    {fieldLabels[field] || field}
+                                                                </span>
+                                                            ))
+                                                        ) : (
+                                                            <span className="text-gray-400 text-sm">All requested</span>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                            )}
+                                            {filter !== "pending" && (
+                                                <td className="px-6 py-4">
+                                                    <p className="text-gray-600 text-sm max-w-xs line-clamp-2">
+                                                        {request.adminNote || "-"}
+                                                    </p>
+                                                </td>
+                                            )}
+                                            {filter === "pending" && (
+                                                <td className="px-6 py-4 text-right">
+                                                    <div className="flex items-center justify-end gap-2">
+                                                        <button
+                                                            onClick={() => openNoteModal(request, "approve")}
+                                                            disabled={processingId === request._id}
+                                                            className="px-3 py-1.5 bg-green-100 text-green-700 rounded-lg text-sm font-medium hover:bg-green-200 transition-colors disabled:opacity-50"
+                                                        >
+                                                            <i className="fas fa-check mr-1"></i>
+                                                            Approve
+                                                        </button>
+                                                        <button
+                                                            onClick={() => openNoteModal(request, "reject")}
+                                                            disabled={processingId === request._id}
+                                                            className="px-3 py-1.5 bg-red-100 text-red-700 rounded-lg text-sm font-medium hover:bg-red-200 transition-colors disabled:opacity-50"
+                                                        >
+                                                            <i className="fas fa-times mr-1"></i>
+                                                            Reject
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            )}
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     </div>
@@ -310,14 +371,14 @@ export default function DownloadRequestsPage() {
             {/* Note Modal */}
             {showNoteModal && selectedRequest && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-2xl w-full max-w-md shadow-xl">
+                    <div className="bg-white rounded-2xl w-full max-w-lg shadow-xl max-h-[90vh] overflow-y-auto">
                         <div className="p-6 border-b border-gray-100">
                             <h3 className="text-lg font-semibold text-gray-800">
                                 {actionType === "approve" ? "Approve Request" : "Reject Request"}
                             </h3>
                             <p className="text-sm text-gray-500 mt-1">
                                 {actionType === "approve"
-                                    ? "User will be able to download the petition data."
+                                    ? "Select which data fields the user can download."
                                     : "User will not be able to download. They can request again."}
                             </p>
                         </div>
@@ -333,6 +394,96 @@ export default function DownloadRequestsPage() {
                                     {selectedRequest.user?.name} ({selectedRequest.user?.email})
                                 </p>
                             </div>
+
+                            {/* Requested Fields Display */}
+                            {selectedRequest.requestedFields && selectedRequest.requestedFields.length > 0 && (
+                                <div className="bg-blue-50 rounded-lg p-4">
+                                    <p className="text-sm font-medium text-blue-800 mb-2">
+                                        <i className="fas fa-list-check mr-2"></i>
+                                        User Requested Data:
+                                    </p>
+                                    <div className="flex flex-wrap gap-2">
+                                        {selectedRequest.requestedFields.map((field) => {
+                                            const fieldLabels = {
+                                                petitionDetails: "Petition Details",
+                                                petitionStarter: "Petition Starter",
+                                                decisionMakers: "Decision Makers",
+                                                statistics: "Statistics",
+                                                signatures: "Signatures List",
+                                                comments: "Comments List",
+                                            };
+                                            return (
+                                                <span
+                                                    key={field}
+                                                    className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full"
+                                                >
+                                                    {fieldLabels[field] || field}
+                                                </span>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Approved Fields Selection (only for approve action) */}
+                            {actionType === "approve" && selectedRequest.requestedFields && selectedRequest.requestedFields.length > 0 && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <i className="fas fa-check-double mr-2"></i>
+                                        Select Fields to Approve <span className="text-red-500">*</span>
+                                    </label>
+                                    <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+                                        {/* Select All */}
+                                        <label className="flex items-center gap-2 cursor-pointer pb-2 border-b border-gray-200">
+                                            <input
+                                                type="checkbox"
+                                                checked={approvedFields.length === selectedRequest.requestedFields.length}
+                                                onChange={(e) => {
+                                                    if (e.target.checked) {
+                                                        setApprovedFields([...selectedRequest.requestedFields]);
+                                                    } else {
+                                                        setApprovedFields([]);
+                                                    }
+                                                }}
+                                                className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                                            />
+                                            <span className="text-sm font-medium text-gray-700">Select All</span>
+                                        </label>
+
+                                        {/* Individual Fields */}
+                                        {selectedRequest.requestedFields.map((field) => {
+                                            const fieldLabels = {
+                                                petitionDetails: "Petition Details (title, problem, solution, country)",
+                                                petitionStarter: "Petition Starter Info (name, location)",
+                                                decisionMakers: "Decision Makers List",
+                                                statistics: "Statistics (signature & comment counts)",
+                                                signatures: "Full Signatures List (names, emails, dates)",
+                                                comments: "Full Comments List (user info, comments)",
+                                            };
+                                            return (
+                                                <label key={field} className="flex items-center gap-2 cursor-pointer">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={approvedFields.includes(field)}
+                                                        onChange={(e) => {
+                                                            if (e.target.checked) {
+                                                                setApprovedFields([...approvedFields, field]);
+                                                            } else {
+                                                                setApprovedFields(approvedFields.filter(f => f !== field));
+                                                            }
+                                                        }}
+                                                        className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                                                    />
+                                                    <span className="text-sm text-gray-600">{fieldLabels[field] || field}</span>
+                                                </label>
+                                            );
+                                        })}
+                                    </div>
+                                    <p className="text-xs text-gray-400 mt-1">
+                                        {approvedFields.length}/{selectedRequest.requestedFields.length} fields selected
+                                    </p>
+                                </div>
+                            )}
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -355,6 +506,7 @@ export default function DownloadRequestsPage() {
                                     setShowNoteModal(false);
                                     setSelectedRequest(null);
                                     setAdminNote("");
+                                    setApprovedFields([]);
                                 }}
                                 className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                             >
@@ -363,12 +515,12 @@ export default function DownloadRequestsPage() {
                             <button
                                 onClick={() => {
                                     if (actionType === "approve") {
-                                        handleApprove(selectedRequest._id, adminNote);
+                                        handleApprove(selectedRequest._id, adminNote, approvedFields);
                                     } else {
                                         handleReject(selectedRequest._id, adminNote);
                                     }
                                 }}
-                                disabled={processingId}
+                                disabled={processingId || (actionType === "approve" && approvedFields.length === 0)}
                                 className={`px-4 py-2 rounded-lg font-medium text-white transition-colors disabled:opacity-50 ${actionType === "approve"
                                     ? "bg-green-600 hover:bg-green-700"
                                     : "bg-red-600 hover:bg-red-700"
