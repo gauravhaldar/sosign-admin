@@ -176,11 +176,64 @@ export default function CommentApprovalPage() {
                                             </div>
 
                                             {/* Petition Info */}
-                                            <div className="flex items-center gap-2">
-                                                <span className="px-3 py-1 inline-flex items-center gap-2 text-xs font-semibold rounded-full bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 border border-blue-200">
-                                                    <i className="fas fa-file-alt"></i>
-                                                    {comment?.petition?.title || "Unknown Petition"}
-                                                </span>
+                                            <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-4">
+                                                <label className="block text-xs font-semibold text-blue-700 mb-3 uppercase tracking-wide">
+                                                    <i className="fas fa-file-alt mr-2"></i>
+                                                    Petition Details
+                                                </label>
+                                                <div className="flex gap-4">
+                                                    {/* Petition Image */}
+                                                    <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
+                                                        {comment?.petition?.petitionDetails?.image ? (
+                                                            <img
+                                                                src={comment.petition.petitionDetails.image}
+                                                                alt={comment?.petition?.title}
+                                                                className="w-full h-full object-cover"
+                                                            />
+                                                        ) : (
+                                                            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200">
+                                                                <i className="fas fa-file-alt text-blue-400 text-2xl"></i>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    {/* Petition Details */}
+                                                    <div className="flex-1 min-w-0">
+                                                        <h4 className="font-semibold text-gray-900 text-sm leading-tight line-clamp-2 mb-2">
+                                                            {comment?.petition?.title || "Unknown Petition"}
+                                                        </h4>
+                                                        <div className="flex flex-wrap gap-2 text-xs">
+                                                            {comment?.petition?.petitionCategory && (
+                                                                <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full font-medium">
+                                                                    <i className="fas fa-tag mr-1"></i>
+                                                                    {comment.petition.petitionCategory}
+                                                                </span>
+                                                            )}
+                                                            {comment?.petition?.signatureCount !== undefined && (
+                                                                <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full font-medium">
+                                                                    <i className="fas fa-pen-nib mr-1"></i>
+                                                                    {comment.petition.signatureCount} signatures
+                                                                </span>
+                                                            )}
+                                                            {comment?.petition?.user?.name && (
+                                                                <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full font-medium">
+                                                                    <i className="fas fa-user mr-1"></i>
+                                                                    by {comment.petition.user.name}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        {comment?.petition?._id && (
+                                                            <a
+                                                                href={`${process.env.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:3000"}/currentpetitions/${comment.petition._id}`}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="inline-flex items-center gap-1 mt-2 text-xs text-blue-600 hover:text-blue-800 font-medium"
+                                                            >
+                                                                <i className="fas fa-external-link-alt"></i>
+                                                                View Petition
+                                                            </a>
+                                                        )}
+                                                    </div>
+                                                </div>
                                             </div>
 
                                             {/* Comment Content */}

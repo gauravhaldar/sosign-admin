@@ -93,6 +93,12 @@ export default function DashboardLayout({ children }) {
             icon: "fas fa-download",
             color: "from-teal-500 to-teal-600",
         },
+        {
+            name: "Blog Management",
+            href: "/dashboard/blogs",
+            icon: "fas fa-blog",
+            color: "from-cyan-500 to-cyan-600",
+        },
     ];
 
     const isActive = (href) => {
