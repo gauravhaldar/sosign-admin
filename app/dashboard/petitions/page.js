@@ -12,6 +12,7 @@ export default function PetitionsPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalPetitions, setTotalPetitions] = useState(0);
   const [deleteLoading, setDeleteLoading] = useState(null);
+  const [downloadLoading, setDownloadLoading] = useState(null);
   const [search, setSearch] = useState("");
   const [selectedCountry, setSelectedCountry] = useState("");
 
@@ -27,8 +28,7 @@ export default function PetitionsPage() {
       });
 
       const response = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
         }/api/admin/petitions?${queryParams}`,
         {
           credentials: "include", // Include admin cookies
@@ -60,8 +60,7 @@ export default function PetitionsPage() {
     try {
       setDeleteLoading(petitionId);
       const response = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
         }/api/admin/petitions/${petitionId}`,
         {
           method: "DELETE",
@@ -87,6 +86,42 @@ export default function PetitionsPage() {
   // Handle petition click to view details
   const handlePetitionClick = (petitionId) => {
     router.push(`/dashboard/petitions/${petitionId}`);
+  };
+
+  // Handle PDF download
+  const handleDownloadPetition = async (petitionId, petitionTitle) => {
+    try {
+      setDownloadLoading(petitionId);
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        }/api/download-requests/admin/download/${petitionId}`,
+        {
+          credentials: "include",
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to download petition PDF");
+      }
+
+      // Get the PDF blob from the response
+      const blob = await response.blob();
+
+      // Create a download link for the PDF
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `petition-${petitionId}-admin-export.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      alert("Failed to download petition: " + err.message);
+    } finally {
+      setDownloadLoading(null);
+    }
   };
 
   // Handle search
@@ -320,26 +355,49 @@ export default function PetitionsPage() {
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation(); // Prevent row click
-                        handleDeletePetition(petition._id, petition.title);
-                      }}
-                      disabled={deleteLoading === petition._id}
-                      className="px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105 flex items-center gap-2 text-sm font-medium"
-                    >
-                      {deleteLoading === petition._id ? (
-                        <>
-                          <i className="fas fa-spinner animate-spin"></i>
-                          Deleting...
-                        </>
-                      ) : (
-                        <>
-                          <i className="fas fa-trash"></i>
-                          Delete
-                        </>
-                      )}
-                    </button>
+                    <div className="flex items-center gap-2">
+                      {/* Download PDF Button */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation(); // Prevent row click
+                          handleDownloadPetition(petition._id, petition.title);
+                        }}
+                        disabled={downloadLoading === petition._id}
+                        className="px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105 flex items-center gap-2 text-sm font-medium"
+                        title="Download Petition PDF"
+                      >
+                        {downloadLoading === petition._id ? (
+                          <>
+                            <i className="fas fa-spinner animate-spin"></i>
+                          </>
+                        ) : (
+                          <>
+                            <i className="fas fa-download"></i>
+                            PDF
+                          </>
+                        )}
+                      </button>
+                      {/* Delete Button */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation(); // Prevent row click
+                          handleDeletePetition(petition._id, petition.title);
+                        }}
+                        disabled={deleteLoading === petition._id}
+                        className="px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105 flex items-center gap-2 text-sm font-medium"
+                        title="Delete Petition"
+                      >
+                        {deleteLoading === petition._id ? (
+                          <>
+                            <i className="fas fa-spinner animate-spin"></i>
+                          </>
+                        ) : (
+                          <>
+                            <i className="fas fa-trash"></i>
+                          </>
+                        )}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -436,11 +494,10 @@ export default function PetitionsPage() {
                           setCurrentPage(page);
                           fetchPetitions(page, search, selectedCountry);
                         }}
-                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium transition-all duration-200 ${
-                          page === currentPage
-                            ? "z-10 bg-gradient-to-r from-blue-50 to-blue-100 border-blue-500 text-blue-600 shadow-md"
-                            : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50 hover:shadow-sm"
-                        }`}
+                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium transition-all duration-200 ${page === currentPage
+                          ? "z-10 bg-gradient-to-r from-blue-50 to-blue-100 border-blue-500 text-blue-600 shadow-md"
+                          : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50 hover:shadow-sm"
+                          }`}
                       >
                         {page}
                       </button>
