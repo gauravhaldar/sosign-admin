@@ -94,6 +94,12 @@ export default function DashboardLayout({ children }) {
             color: "from-teal-500 to-teal-600",
         },
         {
+            name: "Hide Requests",
+            href: "/dashboard/hide-requests",
+            icon: "fas fa-eye-slash",
+            color: "from-orange-500 to-amber-600",
+        },
+        {
             name: "Blog Management",
             href: "/dashboard/blogs",
             icon: "fas fa-blog",
