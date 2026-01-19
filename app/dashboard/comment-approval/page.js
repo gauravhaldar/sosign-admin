@@ -223,7 +223,7 @@ export default function CommentApprovalPage() {
                                                         </div>
                                                         {comment?.petition?._id && (
                                                             <a
-                                                                href={`${process.env.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:3000"}/currentpetitions/${comment.petition._id}`}
+                                                                href={`${process.env.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:3000"}/currentpetitions/${comment.petition.slug || comment.petition._id}`}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 className="inline-flex items-center gap-1 mt-2 text-xs text-blue-600 hover:text-blue-800 font-medium"
