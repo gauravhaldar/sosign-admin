@@ -105,6 +105,12 @@ export default function DashboardLayout({ children }) {
             icon: "fas fa-blog",
             color: "from-cyan-500 to-cyan-600",
         },
+        {
+            name: "Wallet Management",
+            href: "/dashboard/wallets",
+            icon: "fas fa-wallet",
+            color: "from-emerald-500 to-emerald-600",
+        },
     ];
 
     const isActive = (href) => {
