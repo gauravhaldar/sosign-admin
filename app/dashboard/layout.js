@@ -112,6 +112,12 @@ export default function DashboardLayout({ children }) {
             color: "from-emerald-500 to-emerald-600",
         },
         {
+            name: "Wallet Requests",
+            href: "/dashboard/wallet-requests",
+            icon: "fas fa-money-check-alt",
+            color: "from-rose-500 to-rose-600",
+        },
+        {
             name: "User Management",
             href: "/dashboard/users",
             icon: "fas fa-users",
